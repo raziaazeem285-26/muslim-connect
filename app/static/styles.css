@@ -57,6 +57,38 @@ a:hover { text-decoration: underline; }
 .nav-links a:hover, .nav-links button.linklike:hover { background: var(--emerald-50); text-decoration: none; }
 [data-theme="dark"] .nav-links a:hover { background: #16233c; }
 .nav-links a.active { background: var(--emerald-100); color: var(--emerald-900); }
+.nav-toggle {
+  display: none; margin-inline-start: auto; background: var(--emerald-700); color: #fff;
+  border: none; border-radius: 10px; width: 42px; height: 42px; font-size: 1.3rem;
+  cursor: pointer; align-items: center; justify-content: center; flex-shrink: 0;
+}
+@media (max-width: 900px) {
+  .nav-toggle { display: inline-flex; }
+  .nav-links {
+    display: none; position: absolute; top: 100%; inset-inline: 0;
+    flex-direction: column; align-items: stretch; gap: .15rem;
+    background: var(--card); border-bottom: 1px solid var(--line);
+    box-shadow: 0 12px 28px rgba(0,0,0,.14); padding: .6rem .9rem .9rem; z-index: 60;
+    margin: 0; max-height: 70vh; overflow-y: auto;
+  }
+  .nav-links.open { display: flex; }
+  .nav-links a, .nav-links button.linklike {
+    padding: .7rem .9rem; font-size: 1rem; text-align: start; width: 100%;
+    border-bottom: 1px solid var(--line); border-radius: 8px;
+  }
+  .nav-links a:last-child, .nav-links button.linklike:last-child { border-bottom: none; }
+  .topbar-inner { position: relative; flex-wrap: nowrap; }
+  .brand { font-size: 1.02rem; }
+  .brand-mark { width: 34px; height: 34px; font-size: 1.15rem; }
+  .lang-switch { margin-inline-start: 0; }
+}
+/* tables scroll on small screens */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-wrap table { min-width: 640px; }
+@media (max-width: 900px) {
+  table.data { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; }
+  table.data thead, table.data tbody { min-width: 100%; }
+}
 .container { max-width: 1200px; margin: 0 auto; padding: 1.25rem 1rem 4rem; }
 .view { animation: fadeUp .25s ease; }
 @keyframes fadeUp { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none;} }

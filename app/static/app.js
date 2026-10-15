@@ -115,8 +115,29 @@ function renderNav() {
   nav.innerHTML = html;
   const lo = $("#nav-logout");
   if (lo) lo.onclick = async () => { try { await api("/api/auth/logout", { method: "POST" }); } catch {} setToken("", null); location.hash = "#/"; };
+  // mobile menu: close when any link is tapped
+  nav.querySelectorAll("a").forEach(a => a.addEventListener("click", closeMobileNav));
   pollUnread();
 }
+// mobile hamburger menu
+function closeMobileNav() {
+  const nav = $("#nav"), tg = $("#nav-toggle");
+  if (nav) nav.classList.remove("open");
+  if (tg) tg.setAttribute("aria-expanded", "false");
+}
+(function initMobileNav() {
+  document.addEventListener("click", (e) => {
+    const tg = $("#nav-toggle"), nav = $("#nav");
+    if (!tg || !nav) return;
+    if (tg.contains(e.target)) {
+      const open = nav.classList.toggle("open");
+      tg.setAttribute("aria-expanded", open ? "true" : "false");
+    } else if (!nav.contains(e.target)) {
+      closeMobileNav();
+    }
+  });
+  window.addEventListener("hashchange", closeMobileNav);
+})();
 async function pollUnread() {
   const el = $("#nav-unread");
   if (!MC.user || !el) return;
