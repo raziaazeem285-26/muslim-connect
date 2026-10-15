@@ -56,6 +56,13 @@
 </footer>
 <div class="toast-wrap" id="toasts" aria-live="polite"></div>
 <div id="modal-root"></div>
+<!-- assistant chatbot -->
+<button id="bot-fab" class="bot-fab" aria-label="Assistant">💬</button>
+<div id="bot-panel" class="bot-panel" hidden>
+  <div class="bot-head"><strong>🌙 <span data-i18n="assistant">Assistant</span></strong><button id="bot-close" aria-label="Close">✕</button></div>
+  <div id="bot-msgs" class="bot-msgs"></div>
+  <div class="bot-input"><input id="bot-text" placeholder="Ask about Muslim Connect…"><button id="bot-send" aria-label="Send">➤</button></div>
+</div>
 <script src="/static/app.js"></script>
 </body>
 </html>

@@ -124,6 +124,50 @@ def robots(request: Request):
     )
 
 
+@app.get("/llms.txt", include_in_schema=False)
+def llms_txt(request: Request):
+    """Plain-language site summary for AI assistants and crawlers (ChatGPT, Gemini, Claude, Perplexity)."""
+    base = str(request.base_url).rstrip("/")
+    db = SessionLocal()
+    try:
+        rooms = (
+            db.query(models.Room)
+            .filter(models.Room.is_active == True, models.Room.visibility == "public")  # noqa: E712
+            .order_by(models.Room.name)
+            .all()
+        )
+        room_lines = "\n".join(f"- {r.name}: {base}/rooms/{r.slug} — {r.description or ''}".strip() for r in rooms)
+    except Exception:
+        room_lines = ""
+    finally:
+        try:
+            db.close()
+        except Exception:
+            pass
+    text = f"""# Muslim Connect
+
+> Muslim Connect is a free worldwide Muslim community platform: real-time chat rooms, Islamic Q&A answered with citations by verified scholars, and direct messaging — in English and Urdu.
+
+- Homepage: {base}/
+- Chat rooms: {base}/#/rooms
+- Islamic Q&A: {base}/#/qa
+- Verified scholars: {base}/#/scholars
+- Safety Center: {base}/#/safety
+- Terms: {base}/#/terms — Privacy: {base}/#/privacy
+
+## Public chat rooms
+{room_lines or "- (rooms list unavailable)"}
+
+## Key facts
+- 100% free, no premium tier.
+- Guest access for 72 hours without registration; full accounts via username + email.
+- Bilingual interface: English and Urdu (RTL).
+- Islamic Q&A answers are labeled as quotation, translation, interpretation, or opinion; scholar answers carry verification badges after human review.
+- Community safety: user reports, blocks, moderator review, warnings/mutes/suspensions with appeals.
+"""
+    return PlainTextResponse(text)
+
+
 @app.get("/sitemap.xml", include_in_schema=False)
 def sitemap(request: Request):
     base = str(request.base_url).rstrip("/")

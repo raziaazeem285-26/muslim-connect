@@ -85,6 +85,31 @@ a:hover { text-decoration: underline; }
 /* tables scroll on small screens */
 .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 .table-wrap table { min-width: 640px; }
+/* assistant chatbot */
+.bot-fab {
+  position: fixed; bottom: 1.2rem; inset-inline-end: 1.2rem; z-index: 80;
+  width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer; font-size: 1.5rem;
+  background: linear-gradient(135deg, var(--emerald-700), var(--emerald-500)); color: #fff;
+  box-shadow: 0 8px 24px rgba(5,150,105,.45);
+}
+.bot-panel {
+  position: fixed; bottom: 5.2rem; inset-inline-end: 1.2rem; z-index: 80;
+  width: min(360px, calc(100vw - 2rem)); height: 440px; max-height: 70vh;
+  background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+  box-shadow: 0 16px 48px rgba(0,0,0,.2); display: flex; flex-direction: column; overflow: hidden;
+}
+.bot-panel[hidden] { display: none; }
+.bot-head { display: flex; align-items: center; justify-content: space-between; padding: .7rem 1rem; background: var(--emerald-700); color: #fff; }
+.bot-head button { background: none; border: none; color: #fff; font-size: 1rem; cursor: pointer; }
+.bot-msgs { flex: 1; overflow-y: auto; padding: .8rem; display: flex; flex-direction: column; gap: .5rem; }
+.bot-msg { max-width: 85%; padding: .55rem .8rem; border-radius: 12px; font-size: .9rem; line-height: 1.45; }
+.bot-msg.bot { background: var(--emerald-50); color: var(--ink); align-self: flex-start; border-bottom-inline-start-radius: 4px; }
+[data-theme="dark"] .bot-msg.bot { background: #16233c; }
+.bot-msg.me { background: var(--emerald-600); color: #fff; align-self: flex-end; border-bottom-inline-end-radius: 4px; }
+.bot-msg a { color: var(--emerald-700); font-weight: 600; }
+.bot-input { display: flex; gap: .4rem; padding: .6rem; border-top: 1px solid var(--line); }
+.bot-input input { flex: 1; border: 1px solid var(--line); border-radius: 10px; padding: .55rem .8rem; font-size: .9rem; background: var(--bg); color: var(--ink); }
+.bot-input button { background: var(--emerald-600); color: #fff; border: none; border-radius: 10px; width: 42px; cursor: pointer; font-size: 1rem; }
 @media (max-width: 900px) {
   table.data { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; white-space: nowrap; }
   table.data thead, table.data tbody { min-width: 100%; }
