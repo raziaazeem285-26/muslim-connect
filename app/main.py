@@ -110,6 +110,115 @@ def serve_upload(fname: str):
     return FileResponse(path)
 
 
+# --- SEO: robots.txt, sitemap.xml, crawlable room pages ----------------------
+from fastapi.responses import PlainTextResponse  # noqa: E402
+import html as _html  # noqa: E402
+import datetime as _dt  # noqa: E402
+
+
+@app.get("/robots.txt", include_in_schema=False)
+def robots(request: Request):
+    base = str(request.base_url).rstrip("/")
+    return PlainTextResponse(
+        f"User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: {base}/sitemap.xml\n"
+    )
+
+
+@app.get("/sitemap.xml", include_in_schema=False)
+def sitemap(request: Request):
+    base = str(request.base_url).rstrip("/")
+    today = _dt.date.today().isoformat()
+    urls = [(f"{base}/", today, "daily")]
+    try:
+        db = SessionLocal()
+        try:
+            rooms = (
+                db.query(models.Room)
+                .filter(models.Room.is_active == True, models.Room.visibility == "public")  # noqa: E712
+                .order_by(models.Room.name)
+                .all()
+            )
+            for r in rooms:
+                urls.append((f"{base}/rooms/{r.slug}", today, "hourly"))
+        finally:
+            db.close()
+    except Exception:
+        pass  # never 500 for crawlers; serve at least the homepage
+    items = "\n".join(
+        f'  <url><loc>{_html.escape(u)}</loc><lastmod>{lm}</lastmod>'
+        f"<changefreq>{cf}</changefreq></url>"
+        for u, lm, cf in urls
+    )
+    xml = f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n{items}\n</urlset>'
+    return PlainTextResponse(xml, media_type="application/xml")
+
+
+@app.get("/rooms/{slug}", include_in_schema=False)
+def room_page(slug: str, request: Request):
+    """Server-rendered public room page so search engines can crawl real content."""
+    from .security import sanitize_text
+
+    try:
+        db = SessionLocal()
+        try:
+            room = (
+                db.query(models.Room)
+                .filter(models.Room.slug == slug, models.Room.is_active == True)  # noqa: E712
+                .first()
+            )
+            if not room or room.visibility != "public":
+                return JSONResponse({"detail": "Not found"}, status_code=404)
+            msgs = (
+                db.query(models.Message)
+                .filter(models.Message.room_id == room.id, models.Message.is_deleted == False)  # noqa: E712
+                .order_by(models.Message.id.desc())
+                .limit(20)
+                .all()
+            )
+        finally:
+            db.close()
+    except Exception:
+        return JSONResponse({"detail": "Not found"}, status_code=404)
+    base = str(request.base_url).rstrip("/")
+    title = f"{sanitize_text(room.name)} — Muslim Connect Chat Room"
+    desc = sanitize_text(room.description or f"Join the {room.name} Muslim chat room on Muslim Connect.")
+    msg_html = "".join(
+        f"<li><strong>{_html.escape(m.author.display_name or m.author.username)}</strong>: "
+        f"{_html.escape(sanitize_text(m.body or ''))}</li>"
+        for m in reversed(msgs)
+    ) or "<li>No messages yet — be the first to say salam!</li>"
+    import json as _json  # noqa: E402
+    from fastapi.responses import HTMLResponse  # noqa: E402
+
+    ld = _json.dumps({
+        "@context": "https://schema.org",
+        "@type": "DiscussionForumPosting",
+        "headline": sanitize_text(room.name),
+        "url": f"{base}/rooms/{room.slug}",
+    })
+    page = f"""<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{_html.escape(title)}</title>
+<meta name="description" content="{_html.escape(desc)}">
+<link rel="canonical" href="{base}/rooms/{_html.escape(room.slug)}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{_html.escape(title)}">
+<meta property="og:description" content="{_html.escape(desc)}">
+<meta property="og:url" content="{base}/rooms/{_html.escape(room.slug)}">
+<script type="application/ld+json">{ld}</script>
+</head>
+<body style="font-family:system-ui,sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;color:#1a1a1a">
+<h1>🌙 {_html.escape(sanitize_text(room.name))}</h1>
+<p>{_html.escape(desc)}</p>
+<p><a href="{base}/#/" style="display:inline-block;background:#065f46;color:#fff;padding:.6rem 1.2rem;border-radius:.5rem;text-decoration:none">Join the conversation — free</a></p>
+<h2>Recent messages</h2>
+<ul>{msg_html}</ul>
+<footer><p><a href="{base}/">Muslim Connect</a> — One Ummah. One Community. Respect for All.</p></footer>
+</body></html>"""
+    return HTMLResponse(page)
+
+
 # --- frontend SPA -----------------------------------------------------------
 @app.get("/", include_in_schema=False)
 def spa_root():
