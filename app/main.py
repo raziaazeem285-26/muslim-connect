@@ -120,23 +120,10 @@ app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 @app.get("/{path:path}", include_in_schema=False)
-def spa_fallback(path: str, request: Request):
+def spa_fallback(path: str):
     # hash-routed SPA: every non-API route serves index.html
     if path.startswith("api/"):
-        hdrs = {}
-        for k, v in request.scope.get("headers", []):
-            try:
-                hdrs[k.decode()] = v.decode()
-            except Exception:
-                pass
-        qs = request.scope.get("query_string", b"")
-        srv = request.scope.get("server")
-        return JSONResponse({"detail": "Not found", "got_path": path,
-                             "asgi_path": request.scope.get("path"),
-                             "root_path": request.scope.get("root_path"),
-                             "query_string": qs.decode() if isinstance(qs, bytes) else qs,
-                             "server": list(srv) if srv else None,
-                             "headers": hdrs}, status_code=404)
+        return JSONResponse({"detail": "Not found"}, status_code=404)
     candidate = os.path.join(STATIC_DIR, path)
     if os.path.isfile(candidate):
         return FileResponse(candidate)
