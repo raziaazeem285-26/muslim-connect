@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muslim Connect — One Ummah. One Community. Respect for All.</title>
+<meta name="description" content="Muslim Connect: a worldwide Muslim community — real-time chat, Islamic Q&A, verified scholars, in English and Urdu.">
+<link rel="stylesheet" href="/static/styles.css">
+<link rel="manifest" href="/static/manifest.json">
+<meta name="theme-color" content="#065f46">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23065f46'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle'%3E%F0%9F%8C%99%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<a class="sr-only" href="#view">Skip to content</a>
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#/" aria-label="Muslim Connect home"><span class="brand-mark">🌙</span><span id="brand-name">Muslim Connect</span></a>
+    <nav class="nav-links" id="nav" aria-label="Main navigation"></nav>
+    <div class="lang-switch" role="group" aria-label="Language">
+      <button data-lang="en" aria-label="English">EN</button>
+      <button data-lang="ur" aria-label="اردو">اردو</button>
+    </div>
+  </div>
+</header>
+<main class="container"><div id="view" class="view" tabindex="-1"></div></main>
+<footer class="footer">
+  <div class="container">
+    <div><strong id="foot-brand">Muslim Connect</strong><br><span data-i18n="tagline">One Ummah. One Community. Respect for All.</span></div>
+    <div><a href="#/safety" data-i18n="safety">Safety Center</a><br><a href="#/terms" data-i18n="terms">Terms of Service</a></div>
+    <div><a href="#/privacy" data-i18n="privacy">Privacy Policy</a><br><a href="#/help" data-i18n="help">Help &amp; Contact</a></div>
+    <div style="margin-inline-start:auto"><span id="conn-status" class="status-pill offline" data-i18n="offline">Offline</span></div>
+  </div>
+</footer>
+<div class="toast-wrap" id="toasts" aria-live="polite"></div>
+<div id="modal-root"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
