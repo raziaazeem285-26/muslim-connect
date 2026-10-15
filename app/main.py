@@ -17,9 +17,11 @@ from .database import Base, SessionLocal, engine
 from .routers import admin, auth, chat, moderation, notifications, qa, scholars, users
 from .seed import seed
 
+from .paths import writable_dir
+
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 STATIC_DIR = os.path.join(BASE_DIR, "static")
-UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
+UPLOAD_DIR = writable_dir(os.path.join(BASE_DIR, "uploads"), "mc_uploads")
 
 
 @asynccontextmanager
@@ -97,7 +99,6 @@ def public_config():
 
 
 # --- uploaded images (served with safe content-type) ------------------------
-os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
 @app.get("/uploads/{fname}")

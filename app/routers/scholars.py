@@ -13,12 +13,15 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..database import get_db
 from ..deps import audit, get_client_ip, get_current_user, notify, require_admin, require_registered
+from ..paths import writable_dir
 from ..security import sanitize_text
 
 router = APIRouter(prefix="/api/scholars", tags=["scholars"])
 
-DOC_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scholar_docs")
-os.makedirs(DOC_DIR, exist_ok=True)
+DOC_DIR = writable_dir(
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "scholar_docs"),
+    "mc_scholar_docs",
+)
 ALLOWED_DOC_MIMES = {"application/pdf", "image/png", "image/jpeg"}
 
 

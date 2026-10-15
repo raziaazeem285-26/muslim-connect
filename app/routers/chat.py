@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 from .. import models, schemas
 from ..config import settings
 from ..database import SessionLocal, get_db
+from ..paths import writable_dir
 from ..deps import (
     audit, get_client_ip, get_current_user, get_optional_user, notify, rate_limit, require_registered,
 )
@@ -25,8 +26,10 @@ from ..security import decode_token, extract_mentions, looks_like_spam, sanitize
 
 router = APIRouter(prefix="/api", tags=["chat"])
 
-UPLOAD_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads")
-os.makedirs(UPLOAD_DIR, exist_ok=True)
+UPLOAD_DIR = writable_dir(
+    os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "uploads"),
+    "mc_uploads",
+)
 
 
 # ---------------------------------------------------------------------------
