@@ -27,7 +27,15 @@ async function api(path, opts = {}) {
   }
   let data = null;
   try { data = await res.json(); } catch { /* empty */ }
-  if (!res.ok) throw new Error((data && data.detail) || ("HTTP " + res.status));
+  if (!res.ok) {
+    if (res.status === 401 && MC.token) {
+      // session died (expired or invalid token) — drop it so the user
+      // isn't stuck; they'll see Login/Register and can sign in fresh.
+      MC.token = ""; MC.user = null; localStorage.removeItem("mc_token");
+      try { renderNav(); } catch { /* nav not ready yet */ }
+    }
+    throw new Error((data && data.detail) || ("HTTP " + res.status));
+  }
   return data;
 }
 const apiForm = (path, formData) => fetch(path, {
