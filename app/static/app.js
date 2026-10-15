@@ -1427,3 +1427,49 @@ addRoute("help", views.help);
   route();
   if ("serviceWorker" in navigator) { /* optional; no SW file required */ }
 })();
+
+/* ---------------- assistant chatbot (rule-based, EN/UR) ---------------- */
+(function chatbot() {
+  const fab = document.getElementById("bot-fab"), panel = document.getElementById("bot-panel");
+  const msgs = document.getElementById("bot-msgs"), input = document.getElementById("bot-text");
+  if (!fab || !panel) return;
+  const ur = () => (MC.lang || "en").startsWith("ur");
+
+  const BRAIN = [
+    { k: ["salam", "assalam", "hello", "hi ", "hey", "aoa", "سلام"], en: "Wa alaikum assalam! 🌙 How can I help you with Muslim Connect today?", ur: "Wa alaikum assalam! 🌙 Muslim Connect ke bare mein kya poochna chahengi?" },
+    { k: ["what is", "about", "kya hai", "ye kya"], en: "Muslim Connect is a free worldwide Muslim community — live chat rooms, Islamic Q&A with verified scholars, and direct messaging, in English and Urdu.", ur: "Muslim Connect ek free worldwide Muslim community hai — live chat rooms, verified scholars ke saath Islamic Q&A, aur direct messaging, English aur Urdu mein." },
+    { k: ["register", "sign up", "join", "account", "create"], en: "Tap <a href='#/register'>Create free account</a> — just a username, email and password. Or <a href='#/login'>join as Guest</a> for 72 hours, no email needed.", ur: "<a href='#/register'>Create free account</a> dabayein — sirf username, email aur password. Ya <a href='#/login'>Guest</a> ke tor par 72 ghante ke liye join karein, email ki zaroorat nahi." },
+    { k: ["guest"], en: "Guest mode lets you chat for 72 hours without registering. Your messages stay, and you can upgrade to a full account anytime from your profile.", ur: "Guest mode mein baghair register kiye 72 ghante chat kar sakti hain. Aapke messages mehfooz rehte hain, aur profile se kabhi bhi full account mein upgrade kar sakti hain." },
+    { k: ["room"], en: "We have public rooms: 🌍 Global Ummah, 🇵🇰 Pakistan, 🇮🇳 India, 🕌 Quran Study, 💬 Sisters Corner and more. Open <a href='#/rooms'>Rooms</a> and tap Join.", ur: "Public rooms hain: 🌍 Global Ummah, 🇵🇰 Pakistan, 🇮🇳 India, 🕌 Quran Study, 💬 Sisters Corner aur bhi. <a href='#/rooms'>Rooms</a> kholein aur Join dabayein." },
+    { k: ["q&a", "qa", "question", "sawal", "masla", "fatwa"], en: "Have an Islamic question? Post it in <a href='#/qa'>Q&A</a> — answers are marked as quotation, translation, interpretation or opinion, and verified scholars' answers carry a badge.", ur: "Koi Islamic sawal hai? <a href='#/qa'>Q&A</a> mein poochein — jawab quotation, translation, interpretation ya opinion ke tor par mark hote hain, aur verified scholars ke jawab par badge hota hai." },
+    { k: ["scholar"], en: "Scholars can apply in the <a href='#/scholars'>Scholars</a> section. Applications are human-reviewed; approved scholars get a Verified Scholar badge.", ur: "Scholars <a href='#/scholars'>Scholars</a> section mein apply kar sakte hain. Applications ki human review hoti hai; approved scholars ko Verified Scholar badge milta hai." },
+    { k: ["safe", "report", "block", "abuse", "spam"], en: "Your safety matters. You can report messages, block users, and our moderators review every report. Read the <a href='#/safety'>Safety Center</a>.", ur: "Aapki safety ahem hai. Messages report kar sakti hain, users block kar sakti hain, aur moderators har report dekhte hain. <a href='#/safety'>Safety Center</a> parhein." },
+    { k: ["language", "urdu", "zuban", "bhasha"], en: "Muslim Connect works in English and Urdu — switch anytime with the EN/اردو buttons at the top.", ur: "Muslim Connect English aur Urdu dono mein hai — upar EN/اردو button se kabhi bhi badal sakti hain." },
+    { k: ["free", "price", "cost", "fee", "paisa"], en: "Muslim Connect is 100% free — no fees, no premium tier.", ur: "Muslim Connect 100% free hai — koi fee nahi, koi premium nahi." },
+    { k: ["halal", "haram", "namaz", "roza", "dua", "quran", "hadith", "islamic ruling"], en: "For Islamic rulings, please ask in <a href='#/qa'>Q&A</a> where verified scholars answer with proper citations — I don't give religious rulings myself.", ur: "Islamic rulings ke liye <a href='#/qa'>Q&A</a> mein poochein jahan verified scholars proper references ke saath jawab dete hain — main khud religious ruling nahi deta." },
+  ];
+  const FALLBACK = {
+    en: "I'm a simple helper — I can tell you about joining, rooms, Q&A, scholars and safety. For anything else, try the <a href='#/help'>Help page</a>.",
+    ur: "Main ek simple helper hun — joining, rooms, Q&A, scholars aur safety ke bare mein bata sakta hun. Baqi ke liye <a href='#/help'>Help page</a> dekhein.",
+  };
+
+  function addMsg(text, who) {
+    const d = document.createElement("div");
+    d.className = "bot-msg " + who; d.innerHTML = text;
+    msgs.appendChild(d); msgs.scrollTop = msgs.scrollHeight;
+  }
+  function answer(q) {
+    const s = " " + q.toLowerCase() + " ";
+    for (const b of BRAIN) if (b.k.some(k => s.includes(k))) return ur() ? b.ur : b.en;
+    return ur() ? FALLBACK.ur : FALLBACK.en;
+  }
+  function send() {
+    const q = input.value.trim(); if (!q) return;
+    addMsg(esc(q), "me"); input.value = "";
+    setTimeout(() => addMsg(answer(q), "bot"), 350);
+  }
+  fab.onclick = () => { panel.hidden = !panel.hidden; if (!panel.hidden && !msgs.children.length) addMsg(ur() ? "Assalamualaikum! 🌙 Main Muslim Connect assistant hun — kya madad karun?" : "Assalamualaikum! 🌙 I'm the Muslim Connect assistant — how can I help?", "bot"); };
+  document.getElementById("bot-close").onclick = () => panel.hidden = true;
+  document.getElementById("bot-send").onclick = send;
+  input.addEventListener("keydown", e => { if (e.key === "Enter") send(); });
+})();
