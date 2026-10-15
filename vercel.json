@@ -1,1 +1,1 @@
-{"rewrites":[{"destination":"/api/index?vercel_path=/:path*","source":"/:path*"}]}
+{"$schema":"https://openapi.vercel.sh/vercel.json","functions":{"app.py":{"maxDuration":60}}}
