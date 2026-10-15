@@ -170,7 +170,7 @@ def room_page(slug: str, request: Request):
                 return JSONResponse({"detail": "Not found"}, status_code=404)
             msgs = (
                 db.query(models.Message)
-                .filter(models.Message.room_id == room.id, models.Message.is_deleted == False)  # noqa: E712
+                .filter(models.Message.room_id == room.id, models.Message.deleted_at.is_(None))
                 .order_by(models.Message.id.desc())
                 .limit(20)
                 .all()
